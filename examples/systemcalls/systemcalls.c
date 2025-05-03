@@ -84,7 +84,8 @@ bool do_exec(int count, ...)
         }
         else {
             return false;
-        }    
+        }   
+    } 
     va_end(args);
     return false;
 }
