@@ -2,7 +2,7 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include "systemcalls.h"
-
+#include<fcntl.h>
 /**
  * @param cmd the command to execute with system()
  * @return true if the command in @param cmd was executed
@@ -118,10 +118,40 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
-//    int statusl;
-//    pid_t pid;
 
-    va_end(args);
+    int child_status; 
+    pid_t child_pid;
+    int fd;
+    
+    fd=open(outputfile,O_WRONLY|O_TRUNC|O_CREAT,0644);
+    child_pid = fork();
+    if (child_pid == -1) {
+        va_end(args);
+        return false;
+    }
+    else if (child_pid == 0) {
+        if(dup2(fd,1) < 0) {
+            va_end(args);
+            return false;
+            }
+        close(fd);        
 
-    return true;
-}
+        execv(command[0], command);
+        va_end(args);                                                                                                                    
+        exit(-1);                                                                                                                        
+     }                                                                                                                                   
+    if(waitpid(child_pid,&child_status,0) == -1) {                                                                                             
+        return false;                                                                                                                    
+        }                                                                                                                                
+    else if (WIFEXITED(child_status)) {
+        if (child_status == 0) {
+            return true;
+        }                                                                                                                                
+        else {                                                                                                                           
+            return false;                                                                                                                
+        }                                                                                                                                
+    }                                                                                                                                    
+    va_end(args);                                                                                                                        
+    return false;                                                                                                                        
+}    
+
