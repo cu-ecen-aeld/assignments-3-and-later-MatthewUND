@@ -53,7 +53,7 @@ bool do_exec(int count, ...)
     command[count] = NULL;
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
-    command[count] = command[count];
+//    command[count] = command[count];
 
 /*
  * TODO:
@@ -64,7 +64,7 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
-    int status;
+    int childStatus;
     pid_t pid;
     pid = fork();
     if (pid == -1) {
@@ -72,13 +72,21 @@ bool do_exec(int count, ...)
     }
     else if (pid == 0) {
         execv(command[0], command);
-        }
-    if(waitpid(pid, &status,0) == -1) {
+        va_end(args);
+        exit(-1);    
+     }
+    if(waitpid(pid, &childStatus,0) == -1) {
         return false;
+        }
+    else if (WIFEXITED(childStatus)) {
+        if (childStatus == 0) {
+            return true;
+        }
+        else {
+            return false;
         }    
     va_end(args);
-
-    return true;
+    return false;
 }
 
 /**
@@ -99,7 +107,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     command[count] = NULL;
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
-    command[count] = command[count];
+//    command[count] = command[count];
 
 
 /*
