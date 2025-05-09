@@ -49,10 +49,15 @@ then
 	fi
 fi
 #echo "Removing the old writer utility and compiling as a native application"
+#echo "cat /home/writer.sh"
+#cat /home/writer.sh
+
+#echo "ls -al /home"
+#ls -al /home
 
 for i in $( seq 1 $NUMFILES)
 do
-	/tmp/aeld/rootfs/home/writer.sh "$WRITEDIR/${username}$i.txt" "$WRITESTR"
+    /home/writer.sh "$WRITEDIR/${username}$i.txt" "$WRITESTR"
 done
 
 OUTPUTSTRING=$(./finder.sh "$WRITEDIR" "$WRITESTR")
